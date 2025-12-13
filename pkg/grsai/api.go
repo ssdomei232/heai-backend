@@ -1,6 +1,6 @@
 package grsai
 
-func (c *Client) NanoBananaGenerateImage(model string, prompt string, aspectRatio string, imageSize string, urls []string, webHook string, shutProgress bool) (*WebhookResult, error) {
+func (c *Client) NanoBananaGenerateImage(model string, prompt string, aspectRatio string, imageSize string, urls []string, webHook string) (*WebhookResult, error) {
 	reqData := &NanoBananaRequest{
 		Model:        model,
 		Prompt:       prompt,
