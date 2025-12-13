@@ -1,0 +1,10 @@
+{
+    "mysql": {
+        "host": "192.168.1.12",
+        "database": "entropyai",
+        "user": "entropyai",
+        "password": "xxxxxc"
+    },
+    "grsai_token":"",
+    "base_url": "yourdomain.com"
+}
