@@ -20,6 +20,7 @@ func HandleNanoBananaWebhook(c *gin.Context) {
 	err = c.BindJSON(&resp)
 	if err != nil {
 		log.Printf("webhook回调时绑定json出错: %v", err)
+		c.Status(200)
 		return
 	}
 
@@ -43,6 +44,7 @@ func HandleNanoBananaWebhook(c *gin.Context) {
 			log.Printf("更新NanoBanana任务状态失败: %v", err)
 			return
 		}
+		c.Status(200)
 		return
 	} else {
 		err = updateNanoBananaTaskStatus(taskID, resp.Status, "", "", resp.FailureReason, resp.Error)
@@ -50,6 +52,7 @@ func HandleNanoBananaWebhook(c *gin.Context) {
 			log.Printf("更新NanoBanana任务状态失败: %v", err)
 			return
 		}
+		c.Status(200)
 		return
 	}
 }

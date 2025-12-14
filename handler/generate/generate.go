@@ -3,6 +3,7 @@ package generate
 import (
 	"fmt"
 	"log"
+	"strings"
 
 	"git.mmeiblog.cn/HEntropyAI/HEntropyAI/configs"
 	"git.mmeiblog.cn/HEntropyAI/HEntropyAI/handler/db"
@@ -71,7 +72,7 @@ func HandleGenerateNanoBanana(c *gin.Context) {
 		return
 	}
 
-	err = createNanoBananaGenerateTaskInDB(req.Model, req.Prompt, req.FilePaths, webhookURL, resp.Data.ID)
+	err = createNanoBananaGenerateTaskInDB(req.Model, req.Prompt, req.FilePaths, token, resp.Data.ID)
 	if err != nil {
 		log.Printf("在数据库中创建NanoBanano生成任务失败:%v", err)
 		c.JSON(500, gin.H{
@@ -126,20 +127,20 @@ func getInferenceFileBase64(filepaths []string) (fileBase64 []string, err error)
 	return fileBase64, nil
 }
 
-func createNanoBananaGenerateTaskInDB(model string, prompt string, filepaths []string, webhookURL string, dataID string) error {
+func createNanoBananaGenerateTaskInDB(model string, prompt string, filepaths []string, webhookToken string, dataID string) error {
 	db, err := db.GetDB()
 	if err != nil {
 		return err
 	}
 	defer db.Close()
 
-	var filepathsStr string
+	var filepathsStr strings.Builder
 	for _, filepath := range filepaths {
-		filepathsStr += filepath + ","
+		filepathsStr.WriteString(filepath + ",")
 	}
 
 	_, err = db.Exec("INSERT INTO nanobanana_generate_tasks (model, prompt, reference_image_filepaths, webhook_token, status, data_id) VALUES (?, ?, ?, ?, ?, ?)",
-		model, prompt, filepathsStr, webhookURL, "running", dataID)
+		model, prompt, filepathsStr.String(), webhookToken, "running", dataID)
 	if err != nil {
 		return err
 	}
