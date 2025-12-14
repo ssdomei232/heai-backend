@@ -23,12 +23,18 @@ func HandleGenerateNanoBanana(c *gin.Context) {
 	var err error
 
 	var req NanoBananaGenerateRequest
-	err = c.BindJSON(&req)
-	// fuck the frontend
+	if err = c.BindJSON(&req); err != nil {
+		c.JSON(400, gin.H{
+			"code": 400,
+			"data": "JSON 解析失败"})
+		log.Println(err)
+		return
+	}
+	// 验证请求参数
 	if err = checkNanoBananaGenerateRequest(&req); err != nil {
 		c.JSON(400, gin.H{
-			"code":  400,
-			"error": err.Error()})
+			"code": 400,
+			"data": err.Error()})
 		return
 	}
 
@@ -41,21 +47,25 @@ func HandleGenerateNanoBanana(c *gin.Context) {
 		c.JSON(500, gin.H{"code": 500, "data": "获取用户信息失败"})
 		return
 	}
-	if userInfo.Point < 0 {
+	var pointcost int
+	switch req.Model {
+	case "nano-banana-pro":
+		pointcost = NanoBananaProGeneratePointCost
+	case "nano-banana-fast":
+		pointcost = NanoBananaFastGeneratePointCost
+	default:
+		pointcost = NanoBananaGeneratePointCost
+	}
+
+	if userInfo.Point < pointcost {
 		c.JSON(400, gin.H{
 			"code": 400,
 			"data": "余额不足",
 		})
 		return
 	}
-	switch req.Model {
-	case "nano-banana-pro":
-		err = CostPoint(userInfo.UID, NanoBananaProGeneratePointCost)
-	case "nano-banana-fast":
-		err = CostPoint(userInfo.UID, NanoBananaFastGeneratePointCost)
-	default:
-		err = CostPoint(userInfo.UID, NanoBananaGeneratePointCost)
-	}
+
+	err = CostPoint(userInfo.UID, pointcost)
 	if err != nil {
 		log.Print(err)
 		c.JSON(500, gin.H{"code": 500, "data": "扣费失败"})
@@ -86,8 +96,9 @@ func HandleGenerateNanoBanana(c *gin.Context) {
 			"code": 500,
 			"data": "世界爆炸了，请稍后再试",
 		})
+		return
 	}
-	webhookURL := fmt.Sprintf("https://%s/webhook/nano-banana?t=%s", config.BaseURL, token)
+	webhookURL := fmt.Sprintf("https://%s/v1/webhook/nano-banana?t=%s", config.BaseURL, token)
 
 	var resp *grsai.WebhookResult
 	grsaiClient := grsai.NewClient(config.GsraiToken)
@@ -177,7 +188,7 @@ func createNanoBananaGenerateTaskInDB(model string, prompt string, filepaths []s
 		filepathsStr.WriteString(filepath + ",")
 	}
 
-	_, err = db.Exec("INSERT INTO nanobanana_generate_tasks (model, prompt, reference_image_filepaths, webhook_token, status, data_id) VALUES (?, ?, ?, ?, ?, ?)",
+	_, err = db.Exec("INSERT INTO nanobanana_generate_task (model, prompt, reference_image_filepaths, webhook_token, status, data_id) VALUES (?, ?, ?, ?, ?, ?)",
 		model, prompt, filepathsStr.String(), webhookToken, "running", dataID)
 	if err != nil {
 		return err

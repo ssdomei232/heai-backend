@@ -25,7 +25,7 @@ func HandleNanoBananaWebhook(c *gin.Context) {
 	}
 
 	// 如果生成成功，下载图片并更新任务状态
-	if resp.Status == "success" && len(resp.Results) > 0 {
+	if resp.Status == "succeeded" && len(resp.Results) > 0 {
 		err = os.MkdirAll("data/"+time.Now().Format("2006/01/02"), 0755)
 		if err != nil {
 			log.Printf("创建目录失败: %v", err)
