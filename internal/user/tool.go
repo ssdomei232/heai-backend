@@ -79,7 +79,7 @@ func verifyUser(u *User) error {
 	return verifyPassword(hashedPassword, u.Password)
 }
 
-func getUserInfo(username string) (*User, error) {
+func GetUserInfo(username string) (*User, error) {
 	db, err := db.GetDB()
 	if err != nil {
 		return nil, err

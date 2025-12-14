@@ -69,7 +69,7 @@ func HandleLogin(c *gin.Context) {
 func HandleGetUserInfo(c *gin.Context) {
 	session := sessions.Default(c)
 	username := session.Get("username")
-	userInfo, err := getUserInfo(username.(string))
+	userInfo, err := GetUserInfo(username.(string))
 	if err != nil {
 		log.Print(err)
 		c.JSON(500, gin.H{"code": 500, "data": "获取用户信息失败"})
@@ -81,7 +81,7 @@ func HandleGetUserInfo(c *gin.Context) {
 func HandleGetNanoBananaGenerateTask(c *gin.Context) {
 	session := sessions.Default(c)
 	username := session.Get("username")
-	userInfo, err := getUserInfo(username.(string))
+	userInfo, err := GetUserInfo(username.(string))
 	if err != nil {
 		log.Print(err)
 		c.JSON(500, gin.H{"code": 500, "data": "获取用户信息失败"})
