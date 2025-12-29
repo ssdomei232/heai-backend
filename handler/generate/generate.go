@@ -121,7 +121,7 @@ func HandleGenerateNanoBanana(c *gin.Context) {
 		return
 	}
 
-	err = createNanoBananaGenerateTaskInDB(req.uid, req.Model, req.Prompt, req.FilePaths, token, resp.Data.ID)
+	err = createNanoBananaGenerateTaskInDB(userInfo.UID, req.Model, req.Prompt, req.FilePaths, token, resp.Data.ID)
 	if err != nil {
 		log.Printf("在数据库中创建NanoBanano生成任务失败:%v", err)
 		c.JSON(500, gin.H{
