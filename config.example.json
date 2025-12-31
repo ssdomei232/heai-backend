@@ -6,5 +6,9 @@
         "password": "xxxxxc"
     },
     "grsai_token":"",
-    "base_url": "yourdomain.com"
+    "base_url": "yourdomain.com",
+    "trusted_origins": [
+        "heai-api.mmeiblog.cn",
+        "http://localhost:8080"
+    ]
 }

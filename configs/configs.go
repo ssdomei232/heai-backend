@@ -6,9 +6,10 @@ import (
 )
 
 type Configs struct {
-	MYSQL      MYSQL  `json:"mysql"`
-	GsraiToken string `json:"grsai_token"`
-	BaseURL    string `json:"base_url"` // like: yourdomain.com
+	MYSQL          MYSQL    `json:"mysql"`
+	GsraiToken     string   `json:"grsai_token"`
+	BaseURL        string   `json:"base_url"` // like: yourdomain.com
+	TrustedOrigins []string `json:"trusted_origins"`
 }
 
 type MYSQL struct {

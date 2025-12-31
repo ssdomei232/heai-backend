@@ -3,18 +3,27 @@ package csrf
 import (
 	"net/http"
 
+	"git.mmeiblog.cn/HEntropyAI/HEntropyAI/configs"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/csrf"
 )
 
 // 适配 Gorilla CSRF 中间件到 Gin
 func GinCSRFMiddleware() gin.HandlerFunc {
+	config, err := configs.GetConfig()
+	if err != nil {
+		return func(c *gin.Context) {
+			c.JSON(500, gin.H{"code": 500, "data": "服务器配置错误"})
+			c.Abort()
+		}
+	}
+
 	return func(c *gin.Context) {
 		// 使用 gorilla CSRF 中间件包装当前的处理函数
 		csrfMiddleware := csrf.Protect(
 			[]byte("Ahu0eM3xlOvxEJiwa"),
 			csrf.SameSite(csrf.SameSiteNoneMode),
-			csrf.TrustedOrigins([]string{"heai-api.mmeiblog.cn", "127.0.0.1:3000"}),
+			csrf.TrustedOrigins(config.TrustedOrigins),
 			csrf.Secure(true), // 在开发环境中设置为false，生产环境中应为true
 			csrf.ErrorHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				// 将 http.ResponseWriter 和 http.Request 转换回 gin.Context
