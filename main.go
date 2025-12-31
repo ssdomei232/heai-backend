@@ -25,15 +25,12 @@ func main() {
 		// 需要认证的路由组
 		authorized := v1.Group("/")
 		authorized.Use(AuthMiddleware())
-
-		// CSRF 中间件
 		authorized.Use(csrf.GinCSRFMiddleware())
 		{
 			authorized.POST("/generate/nano-banana", generate.HandleGenerateNanoBanana)
-			authorized.GET("/user/info", user.HandleGetUserInfo)
 			authorized.GET("/user/nano-banana-task", user.HandleGetNanoBananaGenerateTask)
-
 			authorized.GET("/csrf-token", csrf.HandleGetCSRFToken)
+			authorized.GET("/user/info", user.HandleGetUserInfo)
 		}
 	}
 
