@@ -2,6 +2,7 @@ package generate
 
 import (
 	"fmt"
+	"html/template"
 	"log"
 	"strings"
 
@@ -30,6 +31,7 @@ func HandleGenerateNanoBanana(c *gin.Context) {
 		log.Println(err)
 		return
 	}
+	req.Prompt = template.HTMLEscapeString(req.Prompt) // 防止 XSS 攻击
 	// 2.验证请求参数
 	if err = checkNanoBananaGenerateRequest(&req); err != nil {
 		c.JSON(400, gin.H{
