@@ -1,9 +1,10 @@
 package main
 
 import (
-	"git.mmeiblog.cn/HEntropyAI/HEntropyAI/handler/generate"
-	"git.mmeiblog.cn/HEntropyAI/HEntropyAI/handler/webhook"
-	"git.mmeiblog.cn/HEntropyAI/HEntropyAI/internal/user"
+	"git.mmeiblog.cn/HEntropyAI/HEntropyAI/api/csrf"
+	"git.mmeiblog.cn/HEntropyAI/HEntropyAI/api/generate"
+	"git.mmeiblog.cn/HEntropyAI/HEntropyAI/api/user"
+	"git.mmeiblog.cn/HEntropyAI/HEntropyAI/api/webhook"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
@@ -24,16 +25,22 @@ func main() {
 		// 需要认证的路由组
 		authorized := v1.Group("/")
 		authorized.Use(AuthMiddleware())
+
+		// CSRF 中间件
+		authorized.Use(csrf.GinCSRFMiddleware())
 		{
 			authorized.POST("/generate/nano-banana", generate.HandleGenerateNanoBanana)
 			authorized.GET("/user/info", user.HandleGetUserInfo)
 			authorized.GET("/user/nano-banana-task", user.HandleGetNanoBananaGenerateTask)
+
+			authorized.GET("/csrf-token", csrf.HandleGetCSRFToken)
 		}
 	}
 
 	r.Run(":8077")
 }
 
+// 认证中间件
 func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		session := sessions.Default(c)

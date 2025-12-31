@@ -5,9 +5,9 @@ import (
 	"log"
 	"strings"
 
+	"git.mmeiblog.cn/HEntropyAI/HEntropyAI/api/user"
 	"git.mmeiblog.cn/HEntropyAI/HEntropyAI/configs"
 	"git.mmeiblog.cn/HEntropyAI/HEntropyAI/handler/db"
-	"git.mmeiblog.cn/HEntropyAI/HEntropyAI/internal/user"
 	"git.mmeiblog.cn/HEntropyAI/HEntropyAI/pkg/grsai"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
@@ -21,7 +21,7 @@ const (
 
 func HandleGenerateNanoBanana(c *gin.Context) {
 	var err error
-
+	// 1. 解析请求参数
 	var req NanoBananaGenerateRequest
 	if err = c.BindJSON(&req); err != nil {
 		c.JSON(400, gin.H{
@@ -30,7 +30,7 @@ func HandleGenerateNanoBanana(c *gin.Context) {
 		log.Println(err)
 		return
 	}
-	// 验证请求参数
+	// 2.验证请求参数
 	if err = checkNanoBananaGenerateRequest(&req); err != nil {
 		c.JSON(400, gin.H{
 			"code": 400,
@@ -38,7 +38,7 @@ func HandleGenerateNanoBanana(c *gin.Context) {
 		return
 	}
 
-	// 计费部分
+	// 3.计费部分
 	session := sessions.Default(c)
 	username := session.Get("username")
 	userInfo, err := user.GetUserInfo(username.(string))
@@ -56,7 +56,6 @@ func HandleGenerateNanoBanana(c *gin.Context) {
 	default:
 		pointcost = NanoBananaGeneratePointCost
 	}
-
 	if userInfo.Point < pointcost {
 		c.JSON(400, gin.H{
 			"code": 400,
@@ -64,7 +63,6 @@ func HandleGenerateNanoBanana(c *gin.Context) {
 		})
 		return
 	}
-
 	err = CostPoint(userInfo.UID, pointcost)
 	if err != nil {
 		log.Print(err)
