@@ -53,10 +53,10 @@ func Generate(req *model.ImageGenerateRequest, userInfo *model.User) (errorCode 
 	}
 
 	// 6.写入数据库
-	err = createGenerateTaskInDB(userInfo.UID, req.Model, req.Prompt, req.FilePaths, token, resp.Data.ID)
+	err = createGenerateTaskInDB(userInfo.UID, req.Model, req.Prompt, req.FilePaths, token, resp.Data.ID, req.ProjectID)
 	if err != nil {
 		log.Printf("在数据库中创建NanoBanano生成任务失败:%v", err)
-		return errorcode.CodeDatabaseError, fmt.Errorf("创建NanoBanano生成任务失败")
+		return errorcode.CodeInternalError, fmt.Errorf("创建NanoBanano生成任务失败")
 	}
 
 	return errorcode.CodeSuccess, nil

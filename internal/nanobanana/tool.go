@@ -36,7 +36,8 @@ func checkNanoBananaGenerateRequest(req *model.ImageGenerateRequest) error {
 	return nil
 }
 
-func createGenerateTaskInDB(uid int, model string, prompt string, filepaths []string, webhookToken string, dataID string) error {
+// 在数据库中创建图像生成任务记录
+func createGenerateTaskInDB(uid int, model string, prompt string, filepaths []string, webhookToken string, dataID string, groupID int) error {
 	db, err := db.GetDB()
 	if err != nil {
 		return err
@@ -54,8 +55,8 @@ func createGenerateTaskInDB(uid int, model string, prompt string, filepaths []st
 		return err
 	}
 
-	_, err = db.Exec("INSERT INTO generate_task (uid, create_at, model, prompt, reference_image_filepaths, category, status) VALUES(?, ?, ?, ?, ?, ?, ?)",
-		uid, time.Now().Unix(), model, prompt, filepathsStr.String(), "image", "running")
+	_, err = db.Exec("INSERT INTO generate_task (uid, create_at, model, prompt, reference_image_filepaths, category, status, project_id) VALUES(?, ?, ?, ?, ?, ?, ?, ?)",
+		uid, time.Now().Unix(), model, prompt, filepathsStr.String(), "image", "running", groupID)
 	if err != nil {
 		return err
 	}

@@ -82,8 +82,14 @@ func updateNanoBananaTaskStatus(id int, status string, resultURL string, resultF
 	}
 	defer db.Close()
 
-	_, err = db.Exec("UPDATE nanobanana_generate_task SET status = ?, result_url = ?, result_filepath = ?, failure_reason = ?, error = ? WHERE id = ?",
-		status, resultURL, resultFilepath, failureReason, error, id)
+	_, err = db.Exec("UPDATE nanobanana_generate_task SET status = ?, result_url = ?, result_filepath = ?, failure_reason = ?, error = ?, finish_at = ? WHERE id = ?",
+		status, resultURL, resultFilepath, failureReason, error, time.Now().Unix(), id)
+	if err != nil {
+		return err
+	}
+
+	_, err = db.Exec("UPDATE generate_task SET status = ?, result_filepath = ?, failure_reason = ?, error = ?, finish_at = ? WHERE id = ?",
+		status, resultURL, failureReason, error, time.Now().Unix(), id)
 	if err != nil {
 		return err
 	}

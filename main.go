@@ -3,6 +3,7 @@ package main
 import (
 	"git.mmeiblog.cn/HEntropyAI/HEntropyAI/api/csrf"
 	"git.mmeiblog.cn/HEntropyAI/HEntropyAI/api/generate"
+	"git.mmeiblog.cn/HEntropyAI/HEntropyAI/api/project"
 	"git.mmeiblog.cn/HEntropyAI/HEntropyAI/api/user"
 	"git.mmeiblog.cn/HEntropyAI/HEntropyAI/api/webhook"
 	"github.com/gin-contrib/sessions"
@@ -31,6 +32,7 @@ func main() {
 			authorized.GET("/user/image-task", user.HandleGetImageGenerateTask)
 			authorized.GET("/csrf-token", csrf.HandleGetCSRFToken)
 			authorized.GET("/user/info", user.HandleGetUserInfo)
+			authorized.GET("/project", project.HandleGetProjects)
 		}
 	}
 
