@@ -1,4 +1,10 @@
-package user
+package model
+
+import (
+	"fmt"
+
+	"git.mmeiblog.cn/HEntropyAI/HEntropyAI/handler/db"
+)
 
 type User struct {
 	UID       int     `json:"uid"`                // 用户ID
@@ -10,7 +16,7 @@ type User struct {
 	CreateAt  int64   `json:"create_at"`          // 创建时间戳
 }
 
-type NanoBananaGenerateTask struct {
+type ImageGenerateTask struct {
 	ID                      int     `json:"id"`
 	UID                     int     `json:"uid"`
 	DataID                  *string `json:"data_id"`
@@ -22,4 +28,29 @@ type NanoBananaGenerateTask struct {
 	Status                  string  `json:"status"`
 	FailureReason           *string `json:"failure_reason"`
 	Error                   *string `json:"error"`
+}
+
+func (u *User) IsValid() error {
+	if u.Username == "" || u.Password == "" {
+		return fmt.Errorf("用户名或密码不能为空")
+	}
+	if len(u.Username) > 32 || len(u.Username) < 2 {
+		return fmt.Errorf("用户名过长或过短")
+	}
+	if len(u.Password) > 64 || len(u.Password) < 6 {
+		return fmt.Errorf("密码过长或过短")
+	}
+	return nil
+}
+
+func (u *User) IsExist() bool {
+	db, err := db.GetDB()
+	if err != nil {
+		return false
+	}
+	defer db.Close()
+
+	var count int
+	err = db.QueryRow("SELECT COUNT(*) FROM user WHERE name = ?", u.Username).Scan(&count)
+	return count > 0
 }

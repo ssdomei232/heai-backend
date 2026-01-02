@@ -4,12 +4,13 @@ import (
 	"log"
 	"strconv"
 
+	"git.mmeiblog.cn/HEntropyAI/HEntropyAI/model"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
 func HandleRegistry(c *gin.Context) {
-	var user User
+	var user model.User
 	var err error
 
 	err = c.BindJSON(&user)
@@ -41,7 +42,7 @@ func HandleRegistry(c *gin.Context) {
 }
 
 func HandleLogin(c *gin.Context) {
-	var user User
+	var user model.User
 	var err error
 
 	err = c.BindJSON(&user)
@@ -78,7 +79,7 @@ func HandleGetUserInfo(c *gin.Context) {
 	c.JSON(200, gin.H{"code": 200, "data": userInfo})
 }
 
-func HandleGetNanoBananaGenerateTask(c *gin.Context) {
+func HandleGetImageGenerateTask(c *gin.Context) {
 	session := sessions.Default(c)
 	username := session.Get("username")
 	userInfo, err := GetUserInfo(username.(string))
@@ -100,7 +101,7 @@ func HandleGetNanoBananaGenerateTask(c *gin.Context) {
 		c.JSON(400, gin.H{"code": 400, "data": "参数错误"})
 		return
 	}
-	tasks, allRecords, err := GetNanoBananaGenerateTask(userInfo.UID, page, perpage)
+	tasks, allRecords, err := GetImageGenerateTask(userInfo.UID, page, perpage)
 	if err != nil {
 		log.Print(err)
 		c.JSON(500, gin.H{"code": 500, "data": "获取任务失败"})

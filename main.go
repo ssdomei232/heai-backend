@@ -27,8 +27,8 @@ func main() {
 		authorized.Use(AuthMiddleware())
 		authorized.Use(csrf.GinCSRFMiddleware())
 		{
-			authorized.POST("/generate/nano-banana", generate.HandleGenerateNanoBanana)
-			authorized.GET("/user/nano-banana-task", user.HandleGetNanoBananaGenerateTask)
+			authorized.POST("/generate/image", generate.HandleGenerateImage)
+			authorized.GET("/user/image-task", user.HandleGetImageGenerateTask)
 			authorized.GET("/csrf-token", csrf.HandleGetCSRFToken)
 			authorized.GET("/user/info", user.HandleGetUserInfo)
 		}

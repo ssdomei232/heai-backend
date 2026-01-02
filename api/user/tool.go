@@ -1,37 +1,12 @@
 package user
 
 import (
-	"fmt"
 	"time"
 
 	"git.mmeiblog.cn/HEntropyAI/HEntropyAI/handler/db"
+	"git.mmeiblog.cn/HEntropyAI/HEntropyAI/model"
 	"golang.org/x/crypto/bcrypt"
 )
-
-func (u *User) IsValid() error {
-	if u.Username == "" || u.Password == "" {
-		return fmt.Errorf("用户名或密码不能为空")
-	}
-	if len(u.Username) > 32 || len(u.Username) < 2 {
-		return fmt.Errorf("用户名过长或过短")
-	}
-	if len(u.Password) > 64 || len(u.Password) < 6 {
-		return fmt.Errorf("密码过长或过短")
-	}
-	return nil
-}
-
-func (u *User) IsExist() bool {
-	db, err := db.GetDB()
-	if err != nil {
-		return false
-	}
-	defer db.Close()
-
-	var count int
-	err = db.QueryRow("SELECT COUNT(*) FROM user WHERE name = ?", u.Username).Scan(&count)
-	return count > 0
-}
 
 // 加密密码
 func encryptPassword(password string) (string, error) {
@@ -47,7 +22,7 @@ func verifyPassword(hashedPassword, inputPassword string) error {
 	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(inputPassword))
 }
 
-func createUser(u *User) error {
+func createUser(u *model.User) error {
 	db, err := db.GetDB()
 	if err != nil {
 		return err
@@ -63,7 +38,7 @@ func createUser(u *User) error {
 	return err
 }
 
-func verifyUser(u *User) error {
+func verifyUser(u *model.User) error {
 	db, err := db.GetDB()
 	if err != nil {
 		return err
@@ -79,14 +54,14 @@ func verifyUser(u *User) error {
 	return verifyPassword(hashedPassword, u.Password)
 }
 
-func GetUserInfo(username string) (*User, error) {
+func GetUserInfo(username string) (*model.User, error) {
 	db, err := db.GetDB()
 	if err != nil {
 		return nil, err
 	}
 	defer db.Close()
 
-	var user User
+	var user model.User
 	err = db.QueryRow("SELECT uid, name, point, avatar_url, email, create_time FROM user WHERE name = ?", username).Scan(
 		&user.UID, &user.Username, &user.Point, &user.AvatarURL, &user.Email, &user.CreateAt)
 	if err != nil {
@@ -95,7 +70,7 @@ func GetUserInfo(username string) (*User, error) {
 	return &user, nil
 }
 
-func GetNanoBananaGenerateTask(uid int, page int, perpage int) (tasks []*NanoBananaGenerateTask, allRecords int, err error) {
+func GetImageGenerateTask(uid int, page int, perpage int) (tasks []*model.ImageGenerateTask, allRecords int, err error) {
 	db, err := db.GetDB()
 	if err != nil {
 		return nil, 0, err
@@ -117,7 +92,7 @@ func GetNanoBananaGenerateTask(uid int, page int, perpage int) (tasks []*NanoBan
 	defer rows.Close()
 
 	for rows.Next() {
-		var task NanoBananaGenerateTask
+		var task model.ImageGenerateTask
 		err := rows.Scan(&task.ID, &task.UID, &task.DataID, &task.Model, &task.Prompt, &task.ReferenceImageFilepaths, &task.ResultURL, &task.ResultFilepath, &task.Status, &task.FailureReason, &task.Error)
 		if err != nil {
 			return nil, 0, err
