@@ -4,6 +4,7 @@ import (
 	"git.mmeiblog.cn/HEntropyAI/HEntropyAI/api/csrf"
 	"git.mmeiblog.cn/HEntropyAI/HEntropyAI/api/generate"
 	"git.mmeiblog.cn/HEntropyAI/HEntropyAI/api/project"
+	"git.mmeiblog.cn/HEntropyAI/HEntropyAI/api/upload"
 	"git.mmeiblog.cn/HEntropyAI/HEntropyAI/api/user"
 	"git.mmeiblog.cn/HEntropyAI/HEntropyAI/api/webhook"
 	"github.com/gin-contrib/sessions"
@@ -36,6 +37,8 @@ func main() {
 			authorized.GET("/project/:id", project.HandleGetProjectDetails)
 			authorized.DELETE("/project/:id", project.HandleDeleteProject)
 			authorized.POST("/project", project.HandleCreateProject)
+			authorized.POST("/upload", upload.HandleUploadImage)
+			authorized.GET("/upload", upload.HandleGetUploadedFiles)
 		}
 	}
 
