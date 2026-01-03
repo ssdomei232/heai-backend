@@ -16,7 +16,6 @@ func HandleNanoBananaWebhook(c *gin.Context) {
 	var err error
 
 	token = c.DefaultQuery("t", "") // Get token
-	taskID := getNanoBananaTaskInfoFromToken(token)
 	err = c.BindJSON(&resp)
 	if err != nil {
 		log.Printf("webhook回调时绑定json出错: %v", err)
@@ -39,7 +38,7 @@ func HandleNanoBananaWebhook(c *gin.Context) {
 			return
 		}
 
-		err = updateNanoBananaTaskStatus(taskID, resp.Status, resp.Results[0].URL, filepath, "", "")
+		err = updateNanoBananaTaskStatus(token, resp.Status, resp.Results[0].URL, filepath, "", "")
 		if err != nil {
 			log.Printf("更新NanoBanana任务状态失败: %v", err)
 			return
@@ -47,7 +46,7 @@ func HandleNanoBananaWebhook(c *gin.Context) {
 		c.Status(200)
 		return
 	} else {
-		err = updateNanoBananaTaskStatus(taskID, resp.Status, "", "", resp.FailureReason, resp.Error)
+		err = updateNanoBananaTaskStatus(token, resp.Status, "", "", resp.FailureReason, resp.Error)
 		if err != nil {
 			log.Printf("更新NanoBanana任务状态失败: %v", err)
 			return
@@ -57,39 +56,21 @@ func HandleNanoBananaWebhook(c *gin.Context) {
 	}
 }
 
-func getNanoBananaTaskInfoFromToken(token string) int {
-	db, err := db.GetDB()
-	if err != nil {
-		log.Printf("获取数据库连接失败: %v", err)
-		return 0
-	}
-	defer db.Close()
-
-	var id int
-	err = db.QueryRow("SELECT id FROM nanobanana_generate_task WHERE webhook_token = ?", token).Scan(&id)
-	if err != nil {
-		log.Printf("获取NanoBanana任务信息失败: %v", err)
-		return 0
-	}
-
-	return id
-}
-
-func updateNanoBananaTaskStatus(id int, status string, resultURL string, resultFilepath string, failureReason string, error string) error {
+func updateNanoBananaTaskStatus(webhookToken string, status string, resultURL string, resultFilepath string, failureReason string, error string) error {
 	db, err := db.GetDB()
 	if err != nil {
 		return err
 	}
 	defer db.Close()
 
-	_, err = db.Exec("UPDATE nanobanana_generate_task SET status = ?, result_url = ?, result_filepath = ?, failure_reason = ?, error = ?, finish_at = ? WHERE id = ?",
-		status, resultURL, resultFilepath, failureReason, error, time.Now().Unix(), id)
+	_, err = db.Exec("UPDATE nanobanana_generate_task SET status = ?, result_url = ?, result_filepath = ?, failure_reason = ?, error = ?, finish_at = ? WHERE webhook_token = ?",
+		status, resultURL, resultFilepath, failureReason, error, time.Now().Unix(), webhookToken)
 	if err != nil {
 		return err
 	}
 
-	_, err = db.Exec("UPDATE generate_task SET status = ?, result_filepath = ?, failure_reason = ?, error = ?, finish_at = ? WHERE id = ?",
-		status, resultURL, failureReason, error, time.Now().Unix(), id)
+	_, err = db.Exec("UPDATE generate_task SET status = ?, result_filepath = ?, failure_reason = ?, error = ?, finish_at = ? WHERE webhook_token = ?",
+		status, resultFilepath, failureReason, error, time.Now().Unix(), webhookToken)
 	if err != nil {
 		return err
 	}

@@ -49,14 +49,14 @@ func createGenerateTaskInDB(uid int, model string, prompt string, filepaths []st
 		filepathsStr.WriteString(filepath + ",")
 	}
 
-	_, err = db.Exec("INSERT INTO nanobanana_generate_task (uid, model, prompt, reference_image_filepaths, webhook_token, status, data_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
-		uid, model, prompt, filepathsStr.String(), webhookToken, "running", dataID)
+	_, err = db.Exec("INSERT INTO nanobanana_generate_task (uid, model, create_at, prompt, reference_image_filepaths, webhook_token, status, data_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+		uid, model, time.Now().Unix(), prompt, filepathsStr.String(), webhookToken, "running", dataID)
 	if err != nil {
 		return err
 	}
 
-	_, err = db.Exec("INSERT INTO generate_task (uid, create_at, model, prompt, reference_image_filepaths, category, status, project_id) VALUES(?, ?, ?, ?, ?, ?, ?, ?)",
-		uid, time.Now().Unix(), model, prompt, filepathsStr.String(), "image", "running", groupID)
+	_, err = db.Exec("INSERT INTO generate_task (uid, create_at, model, prompt, webhook_token, reference_image_filepaths, category, status, project_id) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)",
+		uid, time.Now().Unix(), model, prompt, webhookToken, filepathsStr.String(), "image", "running", groupID)
 	if err != nil {
 		return err
 	}

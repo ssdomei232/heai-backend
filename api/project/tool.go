@@ -61,3 +61,39 @@ func getProjectImageGenerateTasks(projectID int, uid int) (tasks []*model.Genera
 
 	return tasks, nil
 }
+
+// 创建项目
+func createProject(uid int, createAt int64, title string) error {
+	// 1.获取数据库连接
+	db, err := db.GetDB()
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+
+	// 2.执行插入
+	_, err = db.Exec("INSERT INTO project (uid, create_at, title) VALUES (?, ?, ?)", uid, createAt, title)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// 删除项目
+func deleteProject(projectID int, uid int) error {
+	// 1.获取数据库连接
+	db, err := db.GetDB()
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+
+	// 2.执行删除
+	_, err = db.Exec("DELETE FROM project WHERE id = ? AND uid = ?", projectID, uid)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

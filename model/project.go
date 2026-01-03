@@ -9,8 +9,8 @@ type Project struct {
 
 type GenerateTask struct {
 	ID                      int     `json:"id"`
-	CreateAt                int     `json:"create_at"`
-	FinishAt                int     `json:"finish_at"`
+	CreateAt                int64   `json:"create_at"`
+	FinishAt                *int64  `json:"finish_at"`
 	Model                   string  `json:"model"`
 	Prompt                  string  `json:"prompt"`
 	ReferenceImageFilepaths *string `json:"reference_image_filepaths"`
@@ -19,4 +19,8 @@ type GenerateTask struct {
 	Status                  string  `json:"status"`
 	FailureReason           *string `json:"failure_reason"`
 	Error                   *string `json:"error"`
+}
+
+type CreateProjectRequest struct {
+	Title string `json:"title"`
 }

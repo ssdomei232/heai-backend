@@ -34,6 +34,8 @@ func main() {
 			authorized.GET("/user/info", user.HandleGetUserInfo)
 			authorized.GET("/project", project.HandleGetProjects)
 			authorized.GET("/project/:id", project.HandleGetProjectDetails)
+			authorized.DELETE("/project/:id", project.HandleDeleteProject)
+			authorized.POST("/project", project.HandleCreateProject)
 		}
 	}
 

@@ -25,7 +25,7 @@ func HandleGenerateImage(c *gin.Context) {
 		return
 	}
 
-	// 1. 解析请求参数
+	// 1.解析请求参数
 	var req model.ImageGenerateRequest
 	if err = c.BindJSON(&req); err != nil {
 		c.JSON(400, gin.H{
