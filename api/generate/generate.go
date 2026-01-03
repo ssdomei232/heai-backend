@@ -7,7 +7,6 @@ import (
 	"git.mmeiblog.cn/HEntropyAI/HEntropyAI/api/user"
 	"git.mmeiblog.cn/HEntropyAI/HEntropyAI/internal/nanobanana"
 	"git.mmeiblog.cn/HEntropyAI/HEntropyAI/model"
-	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
@@ -19,9 +18,7 @@ const (
 
 func HandleGenerateImage(c *gin.Context) {
 	var err error
-	session := sessions.Default(c)
-	username := session.Get("username")
-	userInfo, err := user.GetUserInfo(username.(string))
+	userInfo, err := user.GetUserInfoByGinCtx(c)
 	if err != nil {
 		log.Print(err)
 		c.JSON(500, gin.H{"code": 500, "data": "获取用户信息失败"})

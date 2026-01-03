@@ -33,6 +33,7 @@ func main() {
 			authorized.GET("/csrf-token", csrf.HandleGetCSRFToken)
 			authorized.GET("/user/info", user.HandleGetUserInfo)
 			authorized.GET("/project", project.HandleGetProjects)
+			authorized.GET("/project/:id", project.HandleGetProjectDetails)
 		}
 	}
 

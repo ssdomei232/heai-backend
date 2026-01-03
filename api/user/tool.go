@@ -5,6 +5,8 @@ import (
 
 	"git.mmeiblog.cn/HEntropyAI/HEntropyAI/handler/db"
 	"git.mmeiblog.cn/HEntropyAI/HEntropyAI/model"
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -54,6 +56,7 @@ func verifyUser(u *model.User) error {
 	return verifyPassword(hashedPassword, u.Password)
 }
 
+// 通过用户名获取用户信息
 func GetUserInfo(username string) (*model.User, error) {
 	db, err := db.GetDB()
 	if err != nil {
@@ -101,4 +104,15 @@ func GetImageGenerateTask(uid int, page int, perpage int) (tasks []*model.ImageG
 	}
 
 	return tasks, allRecords, nil
+}
+
+// 通过 gin.Context 获取用户信息
+func GetUserInfoByGinCtx(c *gin.Context) (userInfo *model.User, err error) {
+	session := sessions.Default(c)
+	username := session.Get("username")
+	userInfo, err = GetUserInfo(username.(string))
+	if err != nil {
+		return nil, err
+	}
+	return userInfo, nil
 }

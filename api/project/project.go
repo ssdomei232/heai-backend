@@ -2,21 +2,18 @@ package project
 
 import (
 	"log"
+	"strconv"
 
 	"git.mmeiblog.cn/HEntropyAI/HEntropyAI/api/user"
-	"git.mmeiblog.cn/HEntropyAI/HEntropyAI/handler/db"
-	"git.mmeiblog.cn/HEntropyAI/HEntropyAI/model"
-	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
+// 获取所有项目
 func HandleGetProjects(c *gin.Context) {
 	var err error
-	session := sessions.Default(c)
-	username := session.Get("username")
-	userInfo, err := user.GetUserInfo(username.(string))
+	userInfo, err := user.GetUserInfoByGinCtx(c)
 	if err != nil {
-		log.Println(err)
+		log.Print(err)
 		c.JSON(500, gin.H{"code": 500, "data": "获取用户信息失败"})
 		return
 	}
@@ -32,29 +29,31 @@ func HandleGetProjects(c *gin.Context) {
 	c.JSON(200, gin.H{"code": 200, "data": gin.H{"projects": projects}})
 }
 
-func getProjects(uid int) (projects []*model.Project, err error) {
-	// 1.获取数据库连接
-	db, err := db.GetDB()
+// 获取指定项目下所有生成任务
+func HandleGetProjectDetails(c *gin.Context) {
+	var err error
+	userInfo, err := user.GetUserInfoByGinCtx(c)
 	if err != nil {
-		return nil, err
+		log.Print(err)
+		c.JSON(500, gin.H{"code": 500, "data": "获取用户信息失败"})
+		return
 	}
-	defer db.Close()
 
-	// 2.执行查询
-	rows, err := db.Query("SELECT id, title, create_at FROM project WHERE uid = ?", uid)
+	// 1.获取项目ID
+	projectID, err := strconv.Atoi(c.Param("project_id"))
 	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		var project model.Project
-		err = rows.Scan(&project.ID, &project.Title, &project.CreateAT)
-		if err != nil {
-			return nil, err
-		}
-		projects = append(projects, &project)
+		log.Print(err)
+		c.JSON(400, gin.H{"code": 400, "data": "参数错误"})
+		return
 	}
 
-	return projects, nil
+	// 2.获取项目下所有生成任务
+	tasks, err := getProjectImageGenerateTasks(projectID, userInfo.UID)
+	if err != nil {
+		log.Println(err)
+		c.JSON(500, gin.H{"code": 500, "data": "获取任务列表失败"})
+		return
+	}
+
+	c.JSON(200, gin.H{"code": 200, "data": gin.H{"tasks": tasks}})
 }
