@@ -14,7 +14,12 @@ type Error struct {
 }
 
 func NewClient(token string) *Client {
-	restyClient := resty.New()
+	restyClient := resty.New().
+		SetRetryCount(3).
+		AddRetryCondition(
+			func(r *resty.Response, err error) bool {
+				return r.StatusCode() >= 500 // 仅在服务端返回5xx时重试
+			})
 	restyClient.SetBaseURL("https://grsai.dakka.com.cn")
 	restyClient.SetHeader("Authorization", "Bearer "+token)
 	restyClient.SetHeader("Accept", "application/json")
