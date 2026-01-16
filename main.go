@@ -2,6 +2,7 @@ package main
 
 import (
 	"git.mmeiblog.cn/HEntropyAI/HEntropyAI/api/csrf"
+	"git.mmeiblog.cn/HEntropyAI/HEntropyAI/api/file"
 	"git.mmeiblog.cn/HEntropyAI/HEntropyAI/api/generate"
 	"git.mmeiblog.cn/HEntropyAI/HEntropyAI/api/project"
 	"git.mmeiblog.cn/HEntropyAI/HEntropyAI/api/upload"
@@ -39,6 +40,7 @@ func main() {
 			authorized.POST("/project", project.HandleCreateProject)
 			authorized.POST("/upload", upload.HandleUploadImage)
 			authorized.GET("/upload", upload.HandleGetUploadedFiles)
+			authorized.GET("/file", file.HandleGetFile)
 		}
 	}
 
