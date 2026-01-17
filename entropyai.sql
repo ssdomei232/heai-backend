@@ -3,13 +3,13 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主机： 192.168.1.12
--- 生成日期： 2026-01-03 01:32:24
+-- 生成日期： 2026-01-17 02:32:45
 -- 服务器版本： 8.4.5
 -- PHP 版本： 8.2.29
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
-SET time_zone = "+08:00";
+SET time_zone = "+00:00";
 
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -34,16 +34,17 @@ CREATE TABLE `generate_task` (
   `finish_at` bigint DEFAULT NULL,
   `model` varchar(255) NOT NULL,
   `prompt` varchar(5000) NOT NULL,
+  `webhook_token` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   `reference_image_filepaths` varchar(500) NOT NULL,
   `category` varchar(255) NOT NULL COMMENT 'image/video',
   `result_filepath` varchar(500) DEFAULT NULL,
   `status` varchar(255) DEFAULT NULL,
   `failure_reason` varchar(255) DEFAULT NULL,
   `error` varchar(255) DEFAULT NULL,
-  `project_id` bigint NOT NULL
+  `project_id` bigint NOT NULL,
+  `sora2_pid` varchar(255) DEFAULT NULL COMMENT '只有sora2有'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- --------------------------------------------------------
 
 --
 -- 表的结构 `nanobanana_generate_task`
@@ -89,7 +90,38 @@ CREATE TABLE `project` (
   `title` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+--
+-- 转存表中的数据 `project`
+--
+
+INSERT INTO `project` (`id`, `uid`, `create_at`, `title`) VALUES
+(1, 2, 1767402000, 'test'),
+(3, 2, 1768565689, 'err'),
+(4, 4, 1768567196, 'devs');
+
 -- --------------------------------------------------------
+
+--
+-- 表的结构 `sora2_generate_task`
+--
+
+CREATE TABLE `sora2_generate_task` (
+  `id` int NOT NULL,
+  `uid` int NOT NULL,
+  `create_at` bigint NOT NULL,
+  `finish_at` bigint DEFAULT NULL,
+  `data_id` varchar(255) DEFAULT NULL,
+  `model` varchar(255) NOT NULL,
+  `reference_image_filepath` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `webhook_token` varchar(255) DEFAULT NULL,
+  `result_url` varchar(255) DEFAULT NULL,
+  `result_filepath` varchar(255) DEFAULT NULL,
+  `status` varchar(255) DEFAULT NULL,
+  `failure_reason` varchar(255) DEFAULT NULL,
+  `error` varchar(255) DEFAULT NULL,
+  `sora2_pid` varchar(255) DEFAULT NULL,
+  `prompt` varchar(5000) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- 表的结构 `upload_image`
@@ -98,10 +130,8 @@ CREATE TABLE `project` (
 CREATE TABLE `upload_image` (
   `id` int NOT NULL,
   `uid` int NOT NULL,
-  `filepath` int NOT NULL
+  `filepath` varchar(500) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
--- --------------------------------------------------------
 
 --
 -- 表的结构 `user`
@@ -140,6 +170,18 @@ ALTER TABLE `price`
   ADD PRIMARY KEY (`id`);
 
 --
+-- 表的索引 `project`
+--
+ALTER TABLE `project`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- 表的索引 `sora2_generate_task`
+--
+ALTER TABLE `sora2_generate_task`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- 表的索引 `upload_image`
 --
 ALTER TABLE `upload_image`
@@ -160,13 +202,13 @@ ALTER TABLE `user`
 -- 使用表AUTO_INCREMENT `generate_task`
 --
 ALTER TABLE `generate_task`
-  MODIFY `id` bigint NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- 使用表AUTO_INCREMENT `nanobanana_generate_task`
 --
 ALTER TABLE `nanobanana_generate_task`
-  MODIFY `id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- 使用表AUTO_INCREMENT `price`
@@ -175,16 +217,28 @@ ALTER TABLE `price`
   MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
+-- 使用表AUTO_INCREMENT `project`
+--
+ALTER TABLE `project`
+  MODIFY `id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- 使用表AUTO_INCREMENT `sora2_generate_task`
+--
+ALTER TABLE `sora2_generate_task`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
 -- 使用表AUTO_INCREMENT `upload_image`
 --
 ALTER TABLE `upload_image`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- 使用表AUTO_INCREMENT `user`
 --
 ALTER TABLE `user`
-  MODIFY `uid` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `uid` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
