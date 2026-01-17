@@ -9,6 +9,8 @@
     "base_url": "yourdomain.com",
     "trusted_origins": [
         "heai-api.mmeiblog.cn",
-        "http://localhost:8080"
+        "http://localhost:8080",
+        "ai.mmeiblog.cn",
+        "https://ai.mmeiblog.cn"
     ]
 }

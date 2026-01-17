@@ -1,0 +1,74 @@
+package generate
+
+import (
+	"html/template"
+	"log"
+
+	"git.mmeiblog.cn/HEntropyAI/HEntropyAI/api/user"
+	"git.mmeiblog.cn/HEntropyAI/HEntropyAI/internal/sora2"
+	"git.mmeiblog.cn/HEntropyAI/HEntropyAI/model"
+	"github.com/gin-gonic/gin"
+)
+
+const (
+	Sora2GeneratePointCost = 50
+)
+
+func HandleGenerateVideo(c *gin.Context) {
+	var err error
+	userInfo, err := user.GetUserInfoByGinCtx(c)
+	if err != nil {
+		log.Print(err)
+		c.JSON(500, gin.H{"code": 500, "data": "获取用户信息失败"})
+		return
+	}
+
+	// 1.解析请求参数
+	var req model.VideoGenerateRequest
+	if err = c.BindJSON(&req); err != nil {
+		c.JSON(400, gin.H{
+			"code": 400,
+			"data": "JSON 解析失败"})
+		log.Println(err)
+		return
+	}
+	req.Prompt = template.HTMLEscapeString(req.Prompt) // 防止 XSS 攻击
+
+	// 2.计费部分
+	var pointcost int
+	switch req.Model {
+	case "sora-2":
+		pointcost = Sora2GeneratePointCost
+	default:
+		pointcost = Sora2GeneratePointCost
+	}
+	if userInfo.Point < pointcost {
+		c.JSON(400, gin.H{
+			"code": 400,
+			"data": "余额不足",
+		})
+		return
+	}
+	err = CostPoint(userInfo.UID, pointcost)
+	if err != nil {
+		log.Print(err)
+		c.JSON(500, gin.H{"code": 500, "data": "扣分失败"})
+		return
+	}
+
+	// 3.调用生成函数
+	errorCode, err := sora2.Generate(&req, userInfo)
+	if err != nil {
+		c.JSON(500, gin.H{
+			"code": errorCode,
+			"data": err.Error(),
+		})
+		return
+	}
+
+	// 4.返回成功响应
+	c.JSON(200, gin.H{
+		"code": 200,
+		"data": "任务创建成功",
+	})
+}

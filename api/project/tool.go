@@ -43,7 +43,7 @@ func getProjectImageGenerateTasks(projectID int, uid int) (tasks []*model.Genera
 	defer db.Close()
 
 	// 2.执行查询
-	rows, err := db.Query("SELECT id, create_at, finish_at, model, prompt, reference_image_filepaths, category, result_filepath, status, failure_reason, error FROM generate_task WHERE project_id = ? AND uid = ?", projectID, uid)
+	rows, err := db.Query("SELECT id, create_at, finish_at, model, prompt, reference_image_filepaths, category, result_filepath, status, failure_reason, error, sora2_pid FROM generate_task WHERE project_id = ? AND uid = ?", projectID, uid)
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +52,7 @@ func getProjectImageGenerateTasks(projectID int, uid int) (tasks []*model.Genera
 	// 3.扫描Row
 	for rows.Next() {
 		var task model.GenerateTask
-		err := rows.Scan(&task.ID, &task.CreateAt, &task.FinishAt, &task.Model, &task.Prompt, &task.ReferenceImageFilepaths, &task.Category, &task.ResultFilepath, &task.Status, &task.FailureReason, &task.Error)
+		err := rows.Scan(&task.ID, &task.CreateAt, &task.FinishAt, &task.Model, &task.Prompt, &task.ReferenceImageFilepaths, &task.Category, &task.ResultFilepath, &task.Status, &task.FailureReason, &task.Error, &task.Sora2PID)
 		if err != nil {
 			return nil, err
 		}

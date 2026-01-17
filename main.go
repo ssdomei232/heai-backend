@@ -24,6 +24,7 @@ func main() {
 		v1.POST("/user/registry", user.HandleRegistry)
 		v1.POST("/user/login", user.HandleLogin)
 		v1.POST("/webhook/nano-banana", webhook.HandleNanoBananaWebhook)
+		v1.POST("/webhook/sora2", webhook.HandleSora2Webhook)
 
 		// 需要认证的路由组
 		authorized := v1.Group("/")
@@ -31,6 +32,7 @@ func main() {
 		authorized.Use(csrf.GinCSRFMiddleware())
 		{
 			authorized.POST("/generate/image", generate.HandleGenerateImage)
+			authorized.POST("/generate/video", generate.HandleGenerateVideo)
 			authorized.GET("/user/image-task", user.HandleGetImageGenerateTask)
 			authorized.GET("/csrf-token", csrf.HandleGetCSRFToken)
 			authorized.GET("/user/info", user.HandleGetUserInfo)

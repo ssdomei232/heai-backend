@@ -11,9 +11,9 @@ import (
 )
 
 const (
-	NanoBananaProGeneratePointCost  = 10
-	NanoBananaFastGeneratePointCost = 3
-	NanoBananaGeneratePointCost     = 8
+	NanoBananaProGeneratePointCost  = 50
+	NanoBananaFastGeneratePointCost = 10
+	NanoBananaGeneratePointCost     = 20
 )
 
 func HandleGenerateImage(c *gin.Context) {

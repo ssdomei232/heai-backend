@@ -25,13 +25,20 @@ func hasPermission(c *gin.Context) bool {
 
 	// 3. 在数据库中查询用户是否有该filepath的访问权限
 	filepath := c.Query("f")
-	var count int
-	err = db.QueryRow("SELECT COUNT(*) FROM generate_task WHERE uid = ? AND result_filepath = ?", userInfo.UID, filepath).Scan(&count)
-	log.Println(userInfo.UID, filepath, count)
+	var resultCount int    // 生成结果时使用
+	var referenceCount int // 参考图时使用
+	err = db.QueryRow("SELECT COUNT(*) FROM generate_task WHERE uid = ? AND result_filepath = ?", userInfo.UID, filepath).Scan(&resultCount)
 	if err != nil {
+		log.Println(err)
 		return false
 	}
+	err = db.QueryRow("SELECT COUNT(*) FROM upload_image WHERE uid = ? AND filepath = ?", userInfo.UID, filepath).Scan(&referenceCount)
+	if err != nil {
+		log.Println(err)
+		return false
+	}
+	log.Println("Permission check:", userInfo.UID, filepath, "resultCount:", resultCount, "referenceCount:", referenceCount)
 
 	// 4. 如果count大于0，说明有权限
-	return count > 0
+	return resultCount > 0 || referenceCount > 0
 }

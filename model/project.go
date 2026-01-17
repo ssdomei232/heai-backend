@@ -19,6 +19,7 @@ type GenerateTask struct {
 	Status                  string  `json:"status"`
 	FailureReason           *string `json:"failure_reason"`
 	Error                   *string `json:"error"`
+	Sora2PID                *string `json:"sora2_pid"`
 }
 
 type CreateProjectRequest struct {
