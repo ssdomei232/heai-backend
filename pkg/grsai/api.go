@@ -52,6 +52,7 @@ func (c *Client) Sora2GenerateVideo(model string, prompt string, aspectRatio str
 	reqData := &Sora2Request{
 		Model:         model,
 		Prompt:        prompt,
+		URL:           url,
 		AspectRatio:   aspectRatio,
 		Duration:      duration,
 		RemixTargetID: remixTargetID,

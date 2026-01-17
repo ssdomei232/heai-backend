@@ -31,7 +31,7 @@ func HandleSora2Webhook(c *gin.Context) {
 			return
 		}
 
-		filepath := "data/" + time.Now().Format("2006/01/02") + "/" + resp.ID + ".png"
+		filepath := "data/" + time.Now().Format("2006/01/02") + "/" + resp.ID + ".mp4"
 		err = downloadFile(resp.Results[0].URL, filepath)
 		if err != nil {
 			log.Printf("下载Sora2生成的视频失败: %v", err)

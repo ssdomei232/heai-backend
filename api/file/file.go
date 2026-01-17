@@ -1,6 +1,8 @@
 package file
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+)
 
 // 获取指定路径的媒体文件
 func HandleGetFile(c *gin.Context) {
