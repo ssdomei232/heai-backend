@@ -1,4 +1,8 @@
-暂定: 0.3rmb -> 10 积分  
-nano-banana-pro 10 积分  
-nano-banana-fast 3 积分  
-nano-banana 8 积分  
+# HEAI
+
+一个开源的AI生成素材管理工具
+
+支持 NanoBanana / Sora2
+
+![1](./.github/1.png)
+![2](./.github/2.png)

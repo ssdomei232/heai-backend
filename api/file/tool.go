@@ -37,7 +37,6 @@ func hasPermission(c *gin.Context) bool {
 		log.Println(err)
 		return false
 	}
-	log.Println("Permission check:", userInfo.UID, filepath, "resultCount:", resultCount, "referenceCount:", referenceCount)
 
 	// 4. 如果count大于0，说明有权限
 	return resultCount > 0 || referenceCount > 0
