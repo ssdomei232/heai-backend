@@ -17,6 +17,7 @@ type MYSQL struct {
 	User     string `json:"user"`
 	Password string `json:"password"`
 	DBName   string `json:"database"`
+	Port     int    `json:"port"`
 }
 
 func GetConfig() (config Configs, err error) {

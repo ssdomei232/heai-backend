@@ -17,15 +17,19 @@ func GetDB() (*sql.DB, error) {
 
 	// 验证配置是否完整
 	if config.MYSQL.Host == "" || config.MYSQL.User == "" || config.MYSQL.DBName == "" {
-		return nil, fmt.Errorf("mysql configuration is incomplete: host=%s, user=%s, dbname=%s",
-			config.MYSQL.Host, config.MYSQL.User, config.MYSQL.DBName)
+		return nil, fmt.Errorf("mysql configuration is incomplete: host=%s, user=%s, dbname=%s, port=%d",
+			config.MYSQL.Host, config.MYSQL.User, config.MYSQL.DBName, config.MYSQL.Port)
 	}
 
-	// 构建连接字符串
+	// 构建连接字符串，包含端口
+	hostWithPort := config.MYSQL.Host
+	if config.MYSQL.Port != 0 {
+		hostWithPort = fmt.Sprintf("%s:%d", config.MYSQL.Host, config.MYSQL.Port)
+	}
 	dsn := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
 		config.MYSQL.User,
 		config.MYSQL.Password,
-		config.MYSQL.Host,
+		hostWithPort,
 		config.MYSQL.DBName)
 
 	db, err := sql.Open("mysql", dsn)
