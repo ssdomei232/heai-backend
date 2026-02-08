@@ -32,6 +32,13 @@ func HandleSora2Webhook(c *gin.Context) {
 		}
 
 		filepath := "data/" + time.Now().Format("2006/01/02") + "/" + resp.ID + ".mp4"
+
+		// 感觉不会有这种情况，但还是防一下
+		if len(resp.Results) == 0 {
+			log.Printf("Sora2生成成功但没有结果URL: %v", resp)
+			return
+		}
+
 		err = downloadFile(resp.Results[0].URL, filepath)
 		if err != nil {
 			log.Printf("下载Sora2生成的视频失败: %v", err)
@@ -46,7 +53,12 @@ func HandleSora2Webhook(c *gin.Context) {
 		c.Status(200)
 		return
 	} else {
-		err = updateSora2TaskStatus(token, resp.Status, "", "", resp.FailureReason, resp.Error, resp.Results[0].Pid)
+		if len(resp.Results) == 0 {
+			log.Printf("Sora2生成失败但没有结果URL: %v", resp)
+			err = updateSora2TaskStatus(token, resp.Status, "", "", resp.FailureReason, resp.Error, "")
+		} else {
+			err = updateSora2TaskStatus(token, resp.Status, "", "", resp.FailureReason, resp.Error, resp.Results[0].Pid)
+		}
 		if err != nil {
 			log.Printf("更新Sora2任务状态失败: %v", err)
 			return
@@ -56,6 +68,7 @@ func HandleSora2Webhook(c *gin.Context) {
 	}
 }
 
+// 更新Sora2任务状态
 func updateSora2TaskStatus(webhookToken string, status string, resultURL string, resultFilepath string, failureReason string, error string, sora2Pid string) error {
 	db, err := db.GetDB()
 	if err != nil {
