@@ -49,7 +49,7 @@ func HandleGenerateVideo(c *gin.Context) {
 	err = cost.CostPointsByModelName(userInfo.UID, userInfo.Point, req.Model)
 	if err != nil {
 		log.Print(err)
-		c.JSON(500, gin.H{"code": 500, "data": err})
+		c.JSON(400, gin.H{"code": 400, "data": err})
 		return
 	}
 
