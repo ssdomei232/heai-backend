@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"git.mmeiblog.cn/HEntropyAI/HEntropyAI/api/user"
+	"git.mmeiblog.cn/HEntropyAI/HEntropyAI/internal/cost"
 	"git.mmeiblog.cn/HEntropyAI/HEntropyAI/internal/nanobanana"
 	"git.mmeiblog.cn/HEntropyAI/HEntropyAI/model"
 	"github.com/gin-gonic/gin"
@@ -36,37 +37,21 @@ func HandleGenerateImage(c *gin.Context) {
 	}
 	req.Prompt = template.HTMLEscapeString(req.Prompt) // 防止 XSS 攻击
 
-	// 2.计费部分
-	var pointcost int
-	switch req.Model {
-	case "nano-banana-pro":
-		pointcost = NanoBananaProGeneratePointCost
-	case "nano-banana-fast":
-		pointcost = NanoBananaFastGeneratePointCost
-	default:
-		pointcost = NanoBananaGeneratePointCost
-	}
-	if userInfo.Point < pointcost {
-		c.JSON(400, gin.H{
-			"code": 400,
-			"data": "余额不足",
-		})
-		return
-	}
-	err = CostPoint(userInfo.UID, pointcost)
-	if err != nil {
-		log.Print(err)
-		c.JSON(500, gin.H{"code": 500, "data": "扣费失败"})
-		return
-	}
-
-	// 3.调用生成函数
+	// 2.调用生成函数
 	errorCode, err := nanobanana.Generate(&req, userInfo)
 	if err != nil {
 		c.JSON(500, gin.H{
 			"code": errorCode,
 			"data": err.Error(),
 		})
+		return
+	}
+
+	// 3.计费部分
+	err = cost.CostPointsByModelName(userInfo.UID, userInfo.Point, req.Model)
+	if err != nil {
+		log.Print(err)
+		c.JSON(500, gin.H{"code": 500, "data": err})
 		return
 	}
 
