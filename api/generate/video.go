@@ -11,10 +11,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-const (
-	Sora2GeneratePointCost = 50
-)
-
 func HandleGenerateVideo(c *gin.Context) {
 	var err error
 	userInfo, err := user.GetUserInfoByGinCtx(c)

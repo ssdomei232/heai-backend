@@ -11,12 +11,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-const (
-	NanoBananaProGeneratePointCost  = 50
-	NanoBananaFastGeneratePointCost = 10
-	NanoBananaGeneratePointCost     = 20
-)
-
 func HandleGenerateImage(c *gin.Context) {
 	var err error
 	userInfo, err := user.GetUserInfoByGinCtx(c)
